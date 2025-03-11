@@ -1,0 +1,6 @@
+model_version: 'v2.6'
+preds_version: 'v2.4'
+preds_dir: '/home/BARO_Cluster/data/data/csv/dx/vis-v2.4'
+prompt_version: 'v7'
+save_base_dir: '/home/BARO_Cluster/data/data/llava_input/for-openi'
+thresholds_path: '/home/data1/workspace/bih1122/model_weights/vis-encoder-cls/vis-v2.4/2024-12-17-01-25-46/best_thresholds.npy'

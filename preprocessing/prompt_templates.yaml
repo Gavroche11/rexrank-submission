@@ -1,0 +1,40 @@
+v0:
+  template: "<image>"
+  diagnosis_style: null
+
+v1:
+  template: "Below is an instruction that describes a task, paired with an input that provides further context. Write a response that appropriately completes the request.\n\n### Instruction: Generate a detailed chest X-ray report based on the provided image and diagnostic scores.\n\n### Image: <image>\n\n### Scores of each finding: {}\n\n### Response: "
+  diagnosis_style: 'plain'
+
+v2:
+  template: "Below is an instruction that describes a task, paired with an input that provides further context. Write a response that appropriately completes the request.\n\n### Instruction: You are an experienced radiologist. Generate a detailed chest X-ray report based on the provided image and diagnostic scores.\n\n### Image: <image>\n\n### Scores of each finding:{}\n\n### Response: "
+  diagnosis_style: 'itemize-prob'
+
+v3: 
+  template: "Below is an instruction that describes a task, paired with an input that provides further context. Write a response that appropriately completes the request.\n\n### Instruction: You are an experienced radiologist. Generate a detailed chest X-ray report based on the provided image and diagnostic scores.\n\n### Image: <image>\n\n### Scores of each finding:{}\n\n### Response: "
+  diagnosis_style: 'itemize-binary'
+
+v4: 
+  template: "<image>{}"
+  diagnosis_style: 'itemize-prob'
+
+v5:
+  template: "<image> {} Based on this analysis and the provided image, generate the corresponding impression for the CXR."
+  diagnosis_style: 'sentence'
+
+v6:
+  template: "<image>{}"
+  diagnosis_style: 'itemize-prob-except:EC,LO'
+
+v7:
+  template: "<image>{}"
+  diagnosis_style: "itemize-normalized-prob"
+
+v8:
+  template: "Below is an instruction that describes a task, paired with an input that provides further context. Write a response that appropriately completes the request.\n\n### Instruction: You are an experienced radiologist. Generate a detailed chest X-ray report based on the provided image and diagnostic scores.\n\n### Image: <image>\n\n### Scores of each finding:{}\n\n### Response: "
+  diagnosis_style: 'itemize-prob'
+
+v9:
+  template: "Image: <image>\nPatient Age: <age>\nPatient Gender: <gender>\nDiagnostic Probabilites:{}"
+  diagnosis_style: "itemize-prob"
+  others: "age-gender"

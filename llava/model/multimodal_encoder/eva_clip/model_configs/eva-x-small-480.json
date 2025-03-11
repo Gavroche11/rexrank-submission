@@ -1,0 +1,28 @@
+{
+    "embed_dim": 384,
+    "vision_cfg": {
+        "image_size": 480,
+        "layers": 12,
+        "embed_dim": 384,
+        "num_heads": 6,
+        "patch_size": 16,
+        "eva_model_name": "eva-x-small-480",
+        "qkv_fused": true,
+        "swiglu_mlp": true,
+        "scale_mlp": false,
+        "use_rot_pos_emb": true,
+        "width": 384,
+        "num_classes": 14
+    },
+    "text_cfg": {
+        "context_length": 77,
+        "vocab_size": 49408,
+        "width": 1280,
+        "heads": 20,
+        "layers": 32,
+        "xattn": false,
+        "fusedLN": false
+    }
+}
+
+

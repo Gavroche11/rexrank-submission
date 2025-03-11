@@ -1,0 +1,5 @@
+model_version: 'v3.0'
+preds_version: 'v2.4'
+preds_dir: '/home/BARO_Cluster/data/data/csv/dx/vis-v2.4'
+prompt_version: 'v0'
+save_base_dir: '/home/BARO_Cluster/data/data/llava_input'

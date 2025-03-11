@@ -1,0 +1,18 @@
+img_base_dir: "/home/BARO_Cluster/data/data"
+
+mimic:
+  img_dir: "public/mimic/preprocessed"
+  ann_path: "/home/data3/public/mimic/mimic_v1.5.csv"
+  test_ann_path: '/home/BARO_Cluster/data/data/csv/testset/mimic_test_age_gender.csv'
+
+chexpert:
+  img_dir: "public/chexpert/preprocessed"
+  ann_path: "/home/data3/public/chexpert/chexpert_v1.5.csv"
+  test_ann_path: '/home/BARO_Cluster/data/data/csv/testset/chexpert_test_age_gender.csv'
+
+openi:
+  img_dir: "public/openi/preprocessed"
+  ann_path: "/home/data3/public/openi/openi_v1.1.1.csv"
+  test_ann_path: '/home/BARO_Cluster/data/data/csv/testset/openi_test_age_gender.csv'
+
+save_base_dir: "/home/BARO_Cluster/data/data/llava_input"
