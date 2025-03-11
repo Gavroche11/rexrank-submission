@@ -1,6 +1,15 @@
 import argparse
+import os
+import json
+from tqdm import tqdm
+
+import torch
+
 from dataclasses import dataclass
-from llava.eval.eval_finetune import Arguments, eval_model
+
+from typing import Dict
+
+from llava.eval.eval_finetune import setup_model, disable_torch_init, create_data_loader
 
 from rexrank.preprocess_rexrank import get_right_input_json
 
@@ -13,7 +22,7 @@ MODEL_NAME = "meta-llama/Llama-3.2-1B"
 VERSION = "plain"
 
 CLASSIFIER = "eva-x"
-CLASSIFIER_PRETRAINED = "" # must be changed
+CLASSIFIER_PRETRAINED = "/home/data1/workspace/bih1122/model_weights/vis-encoder-cls/vis-v2.4/2024-12-17-01-25-46/best.pth" # must be changed
 
 VISION_TOWER = "eva-x-base-448"
 VISION_TOWER_PRETRAINED = "/home/data1/workspace/bih1122/model_weights/vis-encoder-cls/vis-v2.4/2024-12-17-01-25-46/best.pth" # must be changed
@@ -67,8 +76,67 @@ class Arguments:
         self.pretrain_mm_mlp_adapter = kwargs.get('pretrain_mm_mlp_adapter', None)
         self.lora_output_dir = kwargs.get('lora_output_dir', LORA_OUTPUT_DIR)
 
-        # etc
-        self.convert_to_csv = kwargs.get('convert_to_csv', True)
+def eval_model(args: Arguments) -> Dict[str, Dict[str, str]]:
+    # Model initialization
+    model, tokenizer, image_processor = setup_model(args)
+    disable_torch_init()
+    
+    # Load questions
+    with open(os.path.expanduser(args.question_file)) as f:
+        questions = json.load(f)
+    
+    # Prepare output file
+    os.makedirs(os.path.dirname(args.answers_file), exist_ok=True)
+    
+    # Create data loader
+    data_loader = create_data_loader(
+        questions, 
+        args.image_folder, 
+        tokenizer, 
+        image_processor, 
+        model.config
+    )
+    
+    # Run inference
+
+    results_dict = {}
+
+    for (input_ids, image_tensors, image_sizes, answers), line in tqdm(zip(data_loader, questions), total=len(questions)):
+        idx = line["id"]
+        cur_prompt = line["conversations"][0]["value"]
+
+        input_ids = input_ids.to(device=args.device, non_blocking=True)
+
+        with torch.inference_mode():
+            output_ids = model.generate(
+                inputs=input_ids,
+                images=image_tensors.to(dtype=torch.bfloat16, device=args.device, non_blocking=True),
+                image_sizes=image_sizes,
+                do_sample=True if args.temperature > 0 else False,
+                temperature=args.temperature,
+                top_p=args.top_p,
+                num_beams=args.num_beams,
+                max_new_tokens=args.max_new_tokens,
+                use_cache=True)
+
+        outputs = tokenizer.batch_decode(output_ids, skip_special_tokens=True)[0].strip()
+        
+        results_dict[idx] = {
+            "model_prediction": outputs
+        }
+
+        # print("\n")
+        # print("#"*50)
+        # print("pred")
+        # print(outputs)
+        # print("\n")
+        # print("gt")
+        # print(answers[0])
+        # print("#"*50)
+        # print("\n")
+
+    return results_dict
+    
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -77,6 +145,7 @@ if __name__ == "__main__":
     parser.add_argument('--img_root_dir', type=str, required=True)
     args = parser.parse_args()
     
+    raw_input = json.load(open(args.input_json_file, "r"))
     get_right_input_json(input_json_file=args.input_json_file,
                          preprocessed_json_file="rexrank/preprocessed/mimic_inference.json",
                          img_root_dir=args.img_root_dir,
@@ -88,4 +157,12 @@ if __name__ == "__main__":
         question_file="rexrank/preprocessed/mimic_inference.json",
         answers_file=args.save_json_file
     )
-    # eval_model(args)
+
+    # model_predictions = eval_model(args)
+    # for study_id, data in raw_input.items():
+    #     data["model_prediction"] = model_predictions[study_id]["model_prediction"]
+
+    # with open(args.save_json_file, "w") as f:
+    #     json.dump(raw_input, f, indent=4)
+
+    
