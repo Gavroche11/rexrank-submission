@@ -2,6 +2,8 @@ import argparse
 from dataclasses import dataclass
 from llava.eval.eval_finetune import Arguments, eval_model
 
+from rexrank.preprocess_rexrank import get_right_input_json
+
 # arguments:
 # parser.add_argument('--input_json_file', type=str,default='../../data/mimic-cxr/test_data.json')
 # parser.add_argument('--save_json_file', type=str,default='../../results/mimic-cxr/MedVersa.json')
@@ -10,10 +12,12 @@ from llava.eval.eval_finetune import Arguments, eval_model
 MODEL_NAME = "meta-llama/Llama-3.2-1B"
 VERSION = "plain"
 
+CLASSIFIER = "eva-x"
+CLASSIFIER_PRETRAINED = "" # must be changed
+
 VISION_TOWER = "eva-x-base-448"
 VISION_TOWER_PRETRAINED = "/home/data1/workspace/bih1122/model_weights/vis-encoder-cls/vis-v2.4/2024-12-17-01-25-46/best.pth" # must be changed
 
-CACHE_DIR = "/home/data1/huggingface" # must be changed
 MAX_NEW_TOKENS = 128
 
 LORA_OUTPUT_DIR = "" # must be changed
@@ -43,7 +47,7 @@ class Arguments:
         self.fp16 = kwargs.get('fp16', False)
         self.device = kwargs.get('device', 'cuda')
         self.local_rank = kwargs.get('local_rank', -1)
-        self.cache_dir = kwargs.get('cache_dir', CACHE_DIR)
+        self.cache_dir = kwargs.get('cache_dir', None)
         self.model_max_length = kwargs.get('model_max_length', 8192)
         self.max_new_tokens = kwargs.get('max_new_tokens', 128)
         self.attn_implementation = "flash_attention_2"
@@ -68,17 +72,20 @@ class Arguments:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--input_json_file', type=str, required=True)
-    parser.add_argument('--save_json_file', type=str, required="rexrank/submission/mimic_outputs.json")
+    parser.add_argument('--input_json_file', type=str, default="rexrank/datasets/ReXRank_MIMICCXR_test.json")
+    parser.add_argument('--save_json_file', type=str, default="rexrank/submission/mimic_outputs.json")
     parser.add_argument('--img_root_dir', type=str, required=True)
     args = parser.parse_args()
     
-    
-
+    get_right_input_json(input_json_file=args.input_json_file,
+                         preprocessed_json_file="rexrank/preprocessed/mimic_inference.json",
+                         img_root_dir=args.img_root_dir,
+                         classifier_model_name=CLASSIFIER,
+                         classifier_pretrained=CLASSIFIER_PRETRAINED)
 
     args = Arguments(
-        image_folder=parser.img_root_dir,
-        question_file="",
-        answers_file=parser.save_json_file
+        image_folder=args.img_root_dir,
+        question_file="rexrank/preprocessed/mimic_inference.json",
+        answers_file=args.save_json_file
     )
-    eval_model(args)
+    # eval_model(args)
