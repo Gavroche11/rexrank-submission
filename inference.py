@@ -9,13 +9,17 @@ from typing import Dict
 from llava.eval.eval_finetune import setup_model, disable_torch_init, create_data_loader
 from rexrank.preprocess_rexrank import get_right_llava_input
 
-MODEL_NAME = "meta-llama/Llama-3.2-1B"
-VERSION = "plain"
+# Classifier
 
 CLASSIFIER = "eva-x"
 CLASSIFIER_PRETRAINED = "/home/data1/workspace/bih1122/model_weights/vis-encoder-cls/vis-v2.4/2024-12-17-01-25-46/best.pth" # must be changed
 
 LLAVA_INPUT_DIR = "rexrank/llava_input"
+
+# Llava eval configs
+
+MODEL_NAME = "meta-llama/Llama-3.2-1B"
+VERSION = "plain"
 
 VISION_TOWER = "eva-x-base-448"
 VISION_TOWER_PRETRAINED = "/home/data1/workspace/bih1122/model_weights/vis-encoder-cls/vis-v2.4/2024-12-17-01-25-46/best.pth" # must be changed
