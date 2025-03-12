@@ -2,27 +2,20 @@ import argparse
 import os
 import json
 from tqdm import tqdm
-
 import torch
-
 from dataclasses import dataclass
-
 from typing import Dict
 
 from llava.eval.eval_finetune import setup_model, disable_torch_init, create_data_loader
-
-from rexrank.preprocess_rexrank import get_right_input_json
-
-# arguments:
-# parser.add_argument('--input_json_file', type=str,default='../../data/mimic-cxr/test_data.json')
-# parser.add_argument('--save_json_file', type=str,default='../../results/mimic-cxr/MedVersa.json')
-# parser.add_argument('--img_root_dir', type=str,default='../../data/mimic-cxr/MIMIC-CXR-JPG/files')
+from rexrank.preprocess_rexrank import get_right_llava_input
 
 MODEL_NAME = "meta-llama/Llama-3.2-1B"
 VERSION = "plain"
 
 CLASSIFIER = "eva-x"
 CLASSIFIER_PRETRAINED = "/home/data1/workspace/bih1122/model_weights/vis-encoder-cls/vis-v2.4/2024-12-17-01-25-46/best.pth" # must be changed
+
+LLAVA_INPUT_DIR = "rexrank/llava_input"
 
 VISION_TOWER = "eva-x-base-448"
 VISION_TOWER_PRETRAINED = "/home/data1/workspace/bih1122/model_weights/vis-encoder-cls/vis-v2.4/2024-12-17-01-25-46/best.pth" # must be changed
@@ -98,7 +91,6 @@ def eval_model(args: Arguments) -> Dict[str, Dict[str, str]]:
     )
     
     # Run inference
-
     results_dict = {}
 
     for (input_ids, image_tensors, image_sizes, answers), line in tqdm(zip(data_loader, questions), total=len(questions)):
@@ -125,36 +117,35 @@ def eval_model(args: Arguments) -> Dict[str, Dict[str, str]]:
             "model_prediction": outputs
         }
 
-        # print("\n")
-        # print("#"*50)
-        # print("pred")
-        # print(outputs)
-        # print("\n")
-        # print("gt")
-        # print(answers[0])
-        # print("#"*50)
-        # print("\n")
-
     return results_dict
     
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--input_json_file', type=str, default="rexrank/datasets/ReXRank_MIMICCXR_test.json")
-    parser.add_argument('--save_json_file', type=str, default="rexrank/submission/mimic_outputs.json")
+    parser.add_argument('--save_json_file', type=str, default="rexrank/outputs/mimic_outputs.json")
     parser.add_argument('--img_root_dir', type=str, required=True)
     args = parser.parse_args()
+
+    if "mimic" in args.input_json_file.lower():
+        llava_input_json = os.path.join(LLAVA_INPUT_DIR, "mimic_llava_input.json")
+    elif "iuxray" in args.input_json_file.lower():
+        llava_input_json = os.path.join(LLAVA_INPUT_DIR, "iuxray_llava_input.json")
+    elif "chexpert" in args.input_json_file.lower():
+        llava_input_json = os.path.join(LLAVA_INPUT_DIR, "chexpert_llava_input.json")
+    else:
+        llava_input_json = os.path.join(LLAVA_INPUT_DIR, "llava_input.json")
     
     raw_input = json.load(open(args.input_json_file, "r"))
-    get_right_input_json(input_json_file=args.input_json_file,
-                         preprocessed_json_file="rexrank/preprocessed/mimic_inference.json",
+    get_right_llava_input(input_json_file=args.input_json_file,
+                         llava_input_json=llava_input_json,
                          img_root_dir=args.img_root_dir,
                          classifier_model_name=CLASSIFIER,
                          classifier_pretrained=CLASSIFIER_PRETRAINED)
 
     args = Arguments(
         image_folder=args.img_root_dir,
-        question_file="rexrank/preprocessed/mimic_inference.json",
+        question_file=llava_input_json,
         answers_file=args.save_json_file
     )
 

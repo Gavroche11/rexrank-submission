@@ -1,7 +1,7 @@
 import json
 from typing import Tuple, List, Dict
 
-def extract_age_and_gender(context: str) -> Tuple[str, str]:
+def extract_age_and_gender_from_context(context: str) -> Tuple[str, str]:
     if not context.startswith("Age:"):
         age_value, gender_value = "N/A", "N/A"
     else:
@@ -48,7 +48,20 @@ def make_right_format(input_json_file: str) -> List[Dict[str, str]]:
         # key_image_idx = image_path.index(key_image_path)
         # key_view_position = view_positions[key_image_idx]
 
-        age, gender = extract_age_and_gender(context)
+        if "age" in data and "sex" in data: # only for chexpert
+            #age
+            try:
+                age = str(int(data["age"]))
+            except:
+                age = "N/A"
+            
+            #gender
+            gender = data["sex"]
+            if gender != "Male" and gender != "Female":
+                gender = "N/A"
+
+        else:
+            age, gender = extract_age_and_gender_from_context(context)
 
         new_dataset.append({
             "study_id": study_id,

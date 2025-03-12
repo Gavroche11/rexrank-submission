@@ -1,5 +1,5 @@
 from rexrank.utils.preprocessing import make_right_format
-from rexrank.utils.build_dataset import MIMICInferenceDataset
+from rexrank.utils.build_dataset import ClassfierInferenceDataset
 from rexrank.classifier import load_model
 
 import torch
@@ -16,8 +16,8 @@ import json
 CHEXPERT_CLASSES = ['Enlarged Cardiomediastinum', 'Cardiomegaly', 'Lung Opacity', 'Lung Lesion', 'Edema', 'Consolidation', 'Pneumonia',
                 'Atelectasis', 'Pneumothorax', 'Pleural Effusion', 'Pleural Other', 'Fracture', 'Support Devices', 'No Finding']
 
-def get_right_input_json(input_json_file: str,
-                         preprocessed_json_file: str,
+def get_right_llava_input(input_json_file: str,
+                         llava_input_json: str,
                          img_root_dir: str,
                          classifier_model_name: str,
                          classifier_pretrained: str):
@@ -26,7 +26,7 @@ def get_right_input_json(input_json_file: str,
 
     # Get diagnoses
     model = load_model(model_name=classifier_model_name, pretrained=classifier_pretrained)
-    inference_dataset = MIMICInferenceDataset(cleaned_dataset=new_dataset,
+    inference_dataset = ClassfierInferenceDataset(cleaned_dataset=new_dataset,
                                               img_root_dir=img_root_dir)
 
     print("Inference dataset:", len(inference_dataset))
@@ -95,7 +95,7 @@ def get_right_input_json(input_json_file: str,
 
         total.append(output_format)
     
-    with open(preprocessed_json_file, 'w') as f:
+    with open(llava_input_json, 'w') as f:
         json.dump(total, f)
 
-    print(f"Saved to {preprocessed_json_file}")
+    print(f"Llava input saved to {llava_input_json}")

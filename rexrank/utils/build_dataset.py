@@ -31,7 +31,7 @@ def build_eva_x_transform(img_size: int):
     return transforms.Compose(t)
 
 
-class MIMICInferenceDataset(Dataset):
+class ClassfierInferenceDataset(Dataset):
     def __init__(self,
                  cleaned_dataset: List[Dict[str, str]],
                  img_root_dir: str,
