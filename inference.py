@@ -62,7 +62,7 @@ class Arguments:
         self.image_folder = kwargs.get('image_folder', None)
         self.image_aspect_ratio = kwargs.get('image_aspect_ratio', 'pad')
         self.question_file = kwargs.get('question_file', None)
-        self.answers_file = kwargs.get('answers_file', None)
+        # self.answers_file = kwargs.get('answers_file', None)
         
         # Generation Configuration
         self.temperature = kwargs.get('temperature', 0.2)
@@ -83,7 +83,7 @@ def eval_model(args: Arguments) -> Dict[str, Dict[str, str]]:
         questions = json.load(f)
     
     # Prepare output file
-    os.makedirs(os.path.dirname(args.answers_file), exist_ok=True)
+    # os.makedirs(os.path.dirname(args.answers_file), exist_ok=True)
     
     # Create data loader
     data_loader = create_data_loader(
@@ -151,8 +151,7 @@ if __name__ == "__main__":
 
     llava_args = Arguments(
         image_folder=args.img_root_dir,
-        question_file=llava_input_json,
-        answers_file=args.save_json_file
+        question_file=llava_input_json
     )
 
     model_predictions = eval_model(llava_args)
