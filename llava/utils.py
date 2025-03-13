@@ -4,7 +4,9 @@ import logging.handlers
 import os
 import sys
 import numpy as np
-
+from PIL import Image
+import numpy as np
+from typing import Tuple, Optional
 import requests
 
 from llava.constants import LOGDIR
@@ -21,6 +23,118 @@ try:
     from decord import VideoReader, cpu
 except ImportError:
     print("Please install pyav to use video processing functions.")
+
+
+
+class MedicalImagePreprocessor:
+    def __init__(self, width_param: float = 4.0, target_size: int = 512):
+        """
+        Initialize the medical image preprocessor.
+        
+        Args:
+            width_param: Parameter for windowing, default is 4.0
+            target_size: Target size for the longest dimension, default is 512
+        """
+        self.width_param = width_param
+        self.target_size = target_size
+
+    def apply_windowing(self, image: np.ndarray, do_windowing: bool = False) -> np.ndarray:
+        """
+        Apply windowing to the medical image.
+        
+        Args:
+            image: Input image as numpy array
+            do_windowing: Whether to apply windowing transformation
+            
+        Returns:
+            Windowed image
+        """
+        if not do_windowing:
+            img_min = np.min(image)
+            img_max = np.max(image)
+            image = (image - img_min) / (img_max - img_min + 1e-8)
+            return image
+
+        # Convert to float
+        image = image.astype(float)
+        
+        # Calculate window parameters
+        mean = np.mean(image)
+        std = np.std(image)
+        window_center = mean
+        window_width = self.width_param * std
+        
+        # Apply windowing
+        img_min = window_center - window_width/2
+        img_max = window_center + window_width/2
+        image = np.clip(image, img_min, img_max)
+        
+        # Normalize to [0, 1]
+        image = (image - img_min) / (img_max - img_min + 1e-8)
+        return image
+
+    def remove_black_padding(self, image: Image.Image) -> Image.Image:
+        """
+        Removes black padded space from an X-ray image.
+        
+        Args:
+            image: Input PIL Image
+            
+        Returns:
+            Cropped PIL Image without black padding
+        """
+        # Convert to grayscale if not already
+        if image.mode != 'L':
+            image = image.convert('L')
+            
+        # Get bounding box of non-zero pixels
+        bbox = image.getbbox()
+        
+        if bbox is None:
+            return image
+            
+        # Add margin if desired
+        margin = 0
+        x1, y1, x2, y2 = bbox
+        x1 = max(0, x1 - margin)
+        y1 = max(0, y1 - margin)
+        x2 = min(image.width, x2 + margin)
+        y2 = min(image.height, y2 + margin)
+        
+        # Crop image
+        return image.crop((x1, y1, x2, y2))
+
+    def preprocess(self, image_path: str, do_windowing: bool = True) -> np.ndarray:
+        """
+        Performs complete preprocessing pipeline on a medical image.
+        
+        Args:
+            image_path: Path to the input image
+            do_windowing: Whether to apply windowing transformation
+            
+        Returns:
+            Preprocessed image as numpy array
+        """
+        # Read image
+        try:
+            image = Image.open(image_path)
+        except Exception as e:
+            raise ValueError(f"Could not read image at {image_path}: {str(e)}")
+
+        # Convert to numpy array for windowing
+        image_array = np.array(image)
+        
+        # Apply windowing
+        image_array = self.apply_windowing(image_array, do_windowing)
+        
+        # Convert back to PIL Image for padding removal
+        image = Image.fromarray((image_array * 255).astype(np.uint8))
+        
+        # Remove padding
+        processed = self.remove_black_padding(image)
+        # Convert back to numpy array and normalize
+        
+        return processed.convert('RGB')
 
 def process_video_with_decord(video_file, data_args):
     vr = VideoReader(video_file, ctx=cpu(0), num_threads=1)
