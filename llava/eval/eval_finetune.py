@@ -191,7 +191,7 @@ class CustomDataset(Dataset):
                 image_tensor = self.image_processor.preprocess(image, return_tensors='pt')['pixel_values']
                 image_tensors.append(image_tensor.half().cuda())
         elif isinstance(image_files, str):
-            image_pth = os.path.join(self.image_folder, image_file)
+            image_pth = os.path.join(self.image_folder, image_files)
             image = self.medical_image_preprocessor.preprocess(image_pth, do_windowing=False)
             if self.image_aspect_ratio == "pad":
                 def expand2square(pil_img, background_color):

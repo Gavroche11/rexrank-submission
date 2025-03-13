@@ -26,7 +26,7 @@ VISION_TOWER_PRETRAINED = "/home/data1/workspace/bih1122/model_weights/vis-encod
 
 MAX_NEW_TOKENS = 128
 
-LORA_OUTPUT_DIR = "/home/data1/workspace/bih1122/llava_next_check/v2.9-full/checkpoint-3000" # must be changed
+LORA_OUTPUT_DIR = "/home/data1/workspace/bih1122/llava_next_check/v2.9-full/checkpoint-6692" # must be changed
 
 @dataclass
 class Arguments:

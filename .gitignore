@@ -79,4 +79,4 @@ rexrank/datasets/mimic_debug.json
 rexrank/datasets/chexpert_debug.json
 rexrank/datasets/iuxray_debug.json
 rexrank/llava_input/*.json
-rexrank/outputs/*.json
+rexrank/outputs/*
