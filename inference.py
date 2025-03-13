@@ -12,7 +12,7 @@ from rexrank.preprocess_rexrank import get_right_llava_input
 # Classifier
 
 CLASSIFIER = "eva-x"
-CLASSIFIER_PRETRAINED = "/home/data1/workspace/bih1122/model_weights/vis-encoder-cls/vis-v2.4/2024-12-17-01-25-46/best.pth" # must be changed
+CLASSIFIER_PRETRAINED = "/home/data1/workspace/bih1122/model_weights/vis-encoder-cls/vis-v2.4-best/best.pth" # must be changed
 
 LLAVA_INPUT_DIR = "rexrank/llava_input"
 
@@ -22,11 +22,11 @@ MODEL_NAME = "meta-llama/Llama-3.2-1B"
 VERSION = "plain"
 
 VISION_TOWER = "eva-x-base-448"
-VISION_TOWER_PRETRAINED = "/home/data1/workspace/bih1122/model_weights/vis-encoder-cls/vis-v2.4/2024-12-17-01-25-46/best.pth" # must be changed
+VISION_TOWER_PRETRAINED = "/home/data1/workspace/bih1122/model_weights/vis-encoder-cls/vis-v2.4-best/best.pth" # must be changed
 
 MAX_NEW_TOKENS = 128
 
-LORA_OUTPUT_DIR = "" # must be changed
+LORA_OUTPUT_DIR = "/home/data1/workspace/bih1122/llava_next_check/v2.9-full/checkpoint-3000" # must be changed
 
 @dataclass
 class Arguments:
@@ -131,6 +131,8 @@ if __name__ == "__main__":
     parser.add_argument('--img_root_dir', type=str, required=True)
     args = parser.parse_args()
 
+    os.makedirs(LLAVA_INPUT_DIR, exist_ok=True)
+
     if "mimic" in args.input_json_file.lower():
         llava_input_json = os.path.join(LLAVA_INPUT_DIR, "mimic_llava_input.json")
     elif "iuxray" in args.input_json_file.lower():
@@ -147,17 +149,19 @@ if __name__ == "__main__":
                          classifier_model_name=CLASSIFIER,
                          classifier_pretrained=CLASSIFIER_PRETRAINED)
 
-    args = Arguments(
+    llava_args = Arguments(
         image_folder=args.img_root_dir,
         question_file=llava_input_json,
         answers_file=args.save_json_file
     )
 
-    # model_predictions = eval_model(args)
-    # for study_id, data in raw_input.items():
-    #     data["model_prediction"] = model_predictions[study_id]["model_prediction"]
+    model_predictions = eval_model(llava_args)
+    for study_id, data in raw_input.items():
+        data["model_prediction"] = model_predictions[study_id]["model_prediction"]
 
-    # with open(args.save_json_file, "w") as f:
-    #     json.dump(raw_input, f, indent=4)
+    os.makedirs(os.path.dirname(args.save_json_file), exist_ok=True)
+
+    with open(args.save_json_file, "w") as f:
+        json.dump(raw_input, f, indent=4)
 
     
