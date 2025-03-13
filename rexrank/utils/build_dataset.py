@@ -3,6 +3,7 @@ import os
 from torch.utils.data import Dataset
 from PIL import Image
 from torchvision import transforms
+from llava.utils import MedicalImagePreprocessor
 
 from typing import List, Dict
 
@@ -41,7 +42,7 @@ class ClassfierInferenceDataset(Dataset):
         self.data = cleaned_dataset
         self.img_root_dir = img_root_dir
         self.transform = build_transform(transform_name=transform, img_size=img_size)
-
+        self.medical_image_preprocessor = MedicalImagePreprocessor()
     def __len__(self):
         return len(self.data)
     
@@ -49,7 +50,7 @@ class ClassfierInferenceDataset(Dataset):
         cur_data = self.data[idx]
         study_id = cur_data["study_id"]
         img_path = os.path.join(self.img_root_dir, cur_data["image_path"])
-        img = Image.open(img_path).convert('RGB')
+        img = self.medical_image_preprocessor.preprocess(img_path, do_windowing=False)
         img = self.transform(img)
 
         return study_id, img
