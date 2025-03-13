@@ -33,9 +33,15 @@ pip install flash-attn==2.7.2.post1 --no-build-isolation --no-cache-dir
 
 ## Model Weights
 
-Download the model weights:
-```bash
-# Instructions for downloading model weights will be added
+Download the model weights from [here](https://drive.google.com/drive/folders/1SlP4XyGo73JAI74x9TvVWbQcMHI88snM?usp=sharing). You will have the file `vision_encoder.pth` and the folder `language_model_checkpoint`.
+
+After downloading the weights, define `CLASSIFIER_PRETRAINED`, `VISION_TOWER_PRETRAINED`, and `LORA_OUTPUT_DIR` in `inference.py` as follows:
+```python
+CLASSIFIER_PRETRAINED = "/path/to/vision_encoder.pth"
+...
+VISION_TOWER_PRETRAINED = "/path/to/vision_encoder.pth"
+...
+LORA_OUTPUT_DIR = "/path/to/language_model_checkpoint"
 ```
 
 ## Running Inference
