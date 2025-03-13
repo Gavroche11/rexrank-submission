@@ -8,6 +8,7 @@ from typing import Optional
 from torch.utils.data import Dataset, DataLoader
 from PIL import Image
 from peft import PeftModel
+from llava.utils import MedicalImagePreprocessor
 
 from llava.constants import IMAGE_TOKEN_INDEX, DEFAULT_IMAGE_TOKEN, DEFAULT_IM_START_TOKEN, DEFAULT_IM_END_TOKEN
 from llava.conversation import conv_templates, SeparatorStyle
@@ -162,7 +163,7 @@ class CustomDataset(Dataset):
         self.tokenizer = tokenizer
         self.image_processor = image_processor
         self.model_config = model_config
-
+        self.medical_image_preprocessor = MedicalImagePreprocessor()
     def __getitem__(self, index):
         line = self.conversations[index]
         image_files = line["image"]
@@ -185,11 +186,13 @@ class CustomDataset(Dataset):
 
         if isinstance(image_files, list):
             for image_file in image_files:
-                image = Image.open(os.path.join(self.image_folder, image_file)).convert('RGB')
+                image_pth = os.path.join(self.image_folder, image_file)
+                image = self.medical_image_preprocessor.preprocess(image_pth, do_windowing=False)
                 image_tensor = self.image_processor.preprocess(image, return_tensors='pt')['pixel_values']
                 image_tensors.append(image_tensor.half().cuda())
         elif isinstance(image_files, str):
-            image = Image.open(os.path.join(self.image_folder, image_files)).convert('RGB')
+            image_pth = os.path.join(self.image_folder, image_file)
+            image = self.medical_image_preprocessor.preprocess(image_pth, do_windowing=False)
             if self.image_aspect_ratio == "pad":
                 def expand2square(pil_img, background_color):
                     width, height = pil_img.size
