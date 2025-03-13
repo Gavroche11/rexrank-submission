@@ -73,6 +73,8 @@ data_processing/
 
 debug/
 
+test.ipynb
+
 rexrank/datasets/mimic_debug.json
 rexrank/datasets/chexpert_debug.json
 rexrank/datasets/iuxray_debug.json
