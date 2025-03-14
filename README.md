@@ -6,6 +6,7 @@ This repository contains the submission of **LLaVA-iRAIL** to [ReXrank](https://
 
 - CUDA 12.1.1 with cuDNN 8
 - Python 3.10
+- Conda
 - Git
 
 ## Installation
