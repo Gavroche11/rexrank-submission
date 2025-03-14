@@ -32,6 +32,10 @@ pip install xformers==0.0.23.post1
 pip install flash-attn==2.7.2.post1 --no-build-isolation --no-cache-dir
 ```
 
+4. **Get access to huggingface models**
+
+Get access to [`meta-llama/Meta-Llama-3-8B-Instruct`](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct) and [`meta-llama/Llama-3.2-1B`](https://huggingface.co/meta-llama/Llama-3.2-1B).
+
 ## Model Weights
 
 Download the model weights from [here](https://drive.google.com/drive/folders/1SlP4XyGo73JAI74x9TvVWbQcMHI88snM?usp=sharing). You will have the file `vision_encoder.pth` and the folder `language_model_checkpoint`.
