@@ -127,7 +127,7 @@ def eval_model(args: Arguments) -> Dict[str, Dict[str, str]]:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--input_json_file', type=str, default="rexrank/datasets/ReXRank_MIMICCXR_test.json")
-    parser.add_argument('--save_json_file', type=str, default="rexrank/outputs/mimic_outputs.json")
+    parser.add_argument('--output_json_file', type=str, default="rexrank/outputs/mimic_outputs.json")
     parser.add_argument('--img_root_dir', type=str, required=True)
     args = parser.parse_args()
 
@@ -158,9 +158,9 @@ if __name__ == "__main__":
     for study_id, data in raw_input.items():
         data["model_prediction"] = model_predictions[study_id]["model_prediction"]
 
-    os.makedirs(os.path.dirname(args.save_json_file), exist_ok=True)
+    os.makedirs(os.path.dirname(args.output_json_file), exist_ok=True)
 
-    with open(args.save_json_file, "w") as f:
+    with open(args.output_json_file, "w") as f:
         json.dump(raw_input, f, indent=4)
 
     
