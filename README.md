@@ -1,6 +1,6 @@
-# LLaVA-iRAIL ReXrank Submission
+# DD-LLaVA-X ReXrank Submission
 
-This repository contains the submission of **LLaVA-iRAIL** to [ReXrank](https://rexrank.ai/), developed by [Inhyeok Baek](https://github.com/Gavroche11) of [iRAIL](http://irail.snu.ac.kr/).
+This repository contains the submission of **DD-LLaVA-X** to [ReXrank](https://rexrank.ai/), developed by [Inhyeok Baek](https://github.com/Gavroche11) of [iRAIL](http://irail.snu.ac.kr/).
 
 ## Prerequisites
 
